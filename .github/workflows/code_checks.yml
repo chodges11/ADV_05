@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get install -y mongodb
+        sudo apt-get install -y mongodb-org
         python -m pip install --upgrade pip
         # core packages needed for testing
         pip install pylint pytest pytest-cov
