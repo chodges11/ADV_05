@@ -20,6 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
+        sudo apt-get install -y mongodb
         python -m pip install --upgrade pip
         # core packages needed for testing
         pip install pylint pytest pytest-cov
@@ -34,10 +35,12 @@ jobs:
     - name: Run tests
       if: always()
       run: |
+        mongod -f mongo_config_dev.yml
         pytest ./
 
     - name: Run test coverage
       if: always()
       run: |
+        mongod -f mongo_config_dev.yml
         pytest --cov --cov-fail-under=100 ./
 
