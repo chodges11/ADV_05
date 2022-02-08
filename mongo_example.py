@@ -1,5 +1,14 @@
+"""
+Simple Example of a pymongo application
 
+with a single collection and a simple model
+"""
+
+
+from dataclasses import dataclass
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
+
 
 def start_mongo():
     """
@@ -17,6 +26,14 @@ def start_mongo():
 # Now the actual code for your project
 
 # you don't need to use dataclasses, but it saves some boilerplate!
+@dataclass
+class Director:
+    """
+    Dataclass to hold director information
+    """
+    director_id: str
+    full_name: str
+
 
 class DirectorCollection():
     """
@@ -31,23 +48,26 @@ class DirectorCollection():
         self.mongodb = mongodb  # just in case we need it
         self.dircol = mongodb.directors
 
-
     def __len__(self):
         """ number of Directors in the collection """
-        return self.dircol.count()
+        return self.dircol.count_documents({})
 
     def add_director(self, director_id, full_name):
-
+        """ Add a new director to the Collection """
         new_director = {'_id': director_id,
                         'full_name': full_name,
                         }
-        self.dircol.insert_one(new_director)
+        try:
+            self.dircol.insert_one(new_director)
+        except DuplicateKeyError:
+            return False
+        return True
 
     def search_director(self, director_id):
         '''
-        Searches for user data
+        Searches for a director in the collection
         '''
-        director = self.dorcol.find_one{"_id": director_id}
-
-        return director
-
+        direct = self.dircol.find_one({"_id": director_id})
+        if direct is None:
+            return None
+        return Director(direct['_id'], direct['full_name'])
