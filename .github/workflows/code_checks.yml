@@ -32,17 +32,18 @@ jobs:
       run: |
         pylint `ls -R|grep .py$|xargs`
 
+    - name: Start MongoDB
+      if: always()
+      run: |
+        mongod --fork -f mongo_config_dev.yml
+
     - name: Run tests
       if: always()
       run: |
-        # mongod --fork -f mongo_config_dev.yml
-        mongod -f mongo_config_dev.yml
         pytest ./
 
     - name: Run test coverage
       if: always()
       run: |
-        # mongod --fork -f mongo_config_dev.yml
-        mongod -f mongo_config_dev.yml
         pytest --cov --cov-fail-under=100 ./
 
