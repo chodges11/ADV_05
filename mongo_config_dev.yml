@@ -1,10 +1,14 @@
-# this is set up to be run from the main dir in the repo
-# to start:
+# mongo_config_dev.yaml
+
+# This is configuration set up to be run from the main dir in the repo
+
+# to start Mongo:
 
 # mongod -f mongo_config_dev.yml
-# On Windows you may need the .exe:
-# mongod.exe -f mongo_config_dev.yml
 
+# On Windows you may need the .exe:
+
+# mongod.exe -f mongo_config_dev.yml
 
 net:
   bindIp: 127.0.0.1  # Enter 0.0.0.0,:: to bind to all IPv4 and IPv6 addresses or, alternatively, use the net.bindIpAll setting.
