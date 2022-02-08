@@ -49,6 +49,32 @@ Any other files required by your implementation of this assignment (including da
 
 As usual, your code will need to be linted and score 10/10 on Pylint.
 
+## notes on testing / CI
+
+In order for your tests to run, you need to have mongodb running.
+
+The CI (gitHub Actions) is set up to use this command to start mongo:
+
+`mongod -f mongo_config_dev.yml`
+
+That will configure mongo to use the configuration in the `mongo_config_dev.yml`.
+
+Take a look at the `.yml` file, it's pretty self explanatory, but the key bits are:
+
+The files Mongo creates will go in the ``mongo_files`` dir.
+
+The server will be listening on localhost, and port number
+27017 (which is the default for mongo)
+
+To be consistent, you should use the same config (same command), and this command to start the pymongo client:
+
+`client = MongoClient(host='localhost', port=27017)`
+
+MongoDB allows more than one database at a time -- so you can use one a different one for testing than for operational use. That way your tests won't mess up your real data.
+
+If you have any other requirements than loguru and pymongo, they should be added to the ``requirements.txt`` file.
+
+
 # Tips
 
 * To get MongoDB to use ``user_id`` and ``status_id`` as primary keys for your users and user status collections, use those values as the ``_id`` field for the entries into your collections.
@@ -62,4 +88,6 @@ As usual, your code will need to be linted and score 10/10 on Pylint.
 * Before adding a new status ID, remember to check that the corresponding user ID exists.
 
 * It is always a good idea to write tests for your code. Try to use TDD, and attempt to reach 100% coverage.
+
+
 
