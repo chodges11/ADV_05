@@ -35,6 +35,8 @@ jobs:
     - name: Start MongoDB
       if: always()
       run: |
+        # create mongo_files dir if it's not there
+        [ -d "mongo_files" ] || mkdir mongo_files
         mongod --fork -f mongo_config_dev.yml
 
     - name: Run tests
