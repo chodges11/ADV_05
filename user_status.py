@@ -26,8 +26,7 @@ class UserStatusCollection():
         """
         add a new status message to the collection
         """
-
-        if self.users_coll.find({"_id": user_id}):
+        if self.users_coll.find_one({"_id": user_id}):
             new_status = {"_id": status_id, "user_id": user_id,
                           "status_text": status_text}
             try:
