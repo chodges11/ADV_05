@@ -26,56 +26,59 @@ class UserStatusCollection():
         """
         add a new status message to the collection
         """
+        query = self.users_coll.search_user(user_id)
+        if query is not None:
+            try:
+                new_status = {"_id": status_id, "user_id": user_id,
+                              "status_text": status_text}
+                self.status_coll.insert_one(new_status)
+                logger.info('Add Status')
+                return True
 
-        if status_id in self.database:
-            # Rejects new status if status_id already exists
-            logger.info('Did Not Add User Status: status_id already exists')
-            return False
-        new_status = UserStatus(status_id, user_id, status_text)
-        self.database[status_id] = new_status
-        logger.info('Add User Status')
-        return True
+            except DuplicateKeyError as error:
+                logger.info(f"{type(error)}: {error}")
+                logger.info('Did Not Add User: status already exists')
+                return False
+        logger.info('User does not exist, so status can not be added.')
+        return False
 
     def update_status(self, status_id, user_id, status_text):
         """
         Updates a status message
-
-        The new user_id and status_text are assigned to the existing message
         """
-
-        if status_id not in self.database:
-            # Rejects update if the status_id does not exist
-            logger.info('Did Not Update User Status: status_id does not exist')
-            return False
-        self.database[status_id].user_id = user_id
-        self.database[status_id].status_text = status_text
-        logger.info('Updated User Status')
-        return True
+        query = self.search_status(status_id)
+        if query is not None:
+            status_update = {"_id": status_id, "user_id": user_id,
+                             "status_text": status_text}
+            updates = {"$set": status_update}
+            self.users_coll.update_one(query, updates)
+            logger.info('Updated Status')
+            return True
+        return False
 
     def delete_status(self, status_id):
         """
         deletes the status message with id, status_id
         """
-        if status_id not in self.database:
-            # Fails if status does not exist
-            logger.info('Did Not Delete User Status: status does not exist')
-            return False
-        del self.database[status_id]
-        logger.info('Deleted User Status')
-        return True
+        query = self.search_status(status_id)
+        if query is not None:
+            self.status_coll.delete_one(query)
+            logger.info('Deleted Status.')
+            return True
+        logger.info('Did Not Delete Status: status does not exist: ')
+        return False
 
     def search_status(self, status_id):
         """
         Find and return a status message by its status_id
-
-        Returns an empty UserStatus object if status_id does not exist
         """
-
-        if status_id not in self.database:
+        query = {"_id": status_id}
+        if not self.status_coll.find_one(query):
             # Fails if the status does not exist
             logger.info(
-                'Failed Search For User Status in Database: '
-                'status does not exist')
-            return UserStatus(None, None, None)
-        logger.info('Successfully Searched for User Status')
-        return self.database[status_id]
+                'Failed Search For Status in Database: '
+                'status does not exist'
+            )
+            return None
+        logger.info('Successfully searched for Status')
+        return self.status_coll.find_one(query)

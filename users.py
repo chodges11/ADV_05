@@ -69,8 +69,7 @@ class UserCollection():
             self.users_coll.delete_one(query)
             logger.info('Deleted User and their statuses.')
             return True
-        logger.info(
-            'Did Not Delete User: user does not exist: ')
+        logger.info('Did Not Delete User: user does not exist: ')
         return False
 
     def search_user(self, user_id):
@@ -81,8 +80,8 @@ class UserCollection():
         if not self.users_coll.find_one(query):
             # Fails if the user does not exist
             logger.info(
-                'Failed Search For User in Database: '
-                'user does not exist')
+                'Failed Search For User in Database: user does not exist'
+            )
             return None
-        logger.info('Successfully Searched for User Status')
+        logger.info('Successfully searched for User.')
         return self.users_coll.find_one(query)
