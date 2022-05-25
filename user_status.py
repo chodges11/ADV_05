@@ -8,21 +8,6 @@ from loguru import logger
 from pymongo.errors import DuplicateKeyError
 
 
-class UserStatus():
-    """
-    class to hold status message data
-    """
-
-    def __init__(self, status_id, user_id, status_text):
-        self._id = status_id
-        self.user_id = user_id
-        self.status_text = status_text
-        logger.add(sys.stderr, format="{time} {level} {message}",
-                   filter="my_module", level="INFO")
-        logger.add("log_file.log")
-        logger.info('Created User Status')
-
-
 class UserStatusCollection():
     """
     Collection of UserStatus messages
@@ -30,10 +15,12 @@ class UserStatusCollection():
 
     def __init__(self, database):
         self.database = database
+        self.users_coll = database['users']
+        self.status_coll = database['user_status']
         logger.add(sys.stderr, format="{time} {level} {message}",
                    filter="my_module", level="INFO")
         logger.add("log_file.log")
-        logger.info('Created User Status Collection')
+        logger.info('Created New User Status Collection')
 
     def add_status(self, status_id, user_id, status_text):
         """
