@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 
-class MongoDBConnectionManager:
+class MongoDBConnectionManager():
     """MongoDB Connection."""
 
     def __int__(self, hostname, port):

@@ -85,14 +85,6 @@ def delete_user():
         print("User was successfully deleted")
 
 
-def save_users():
-    """
-    Saves user database into a file
-    """
-    filename = input('Enter filename for users file: ')
-    main.save_users(filename, user_collection)
-
-
 def add_status():
     """
     Adds a new status into the database
@@ -144,14 +136,6 @@ def delete_status():
         print("Status was successfully deleted")
 
 
-def save_status():
-    """
-    Saves status database into a file
-    """
-    filename = input('Enter filename for status file: ')
-    main.save_status_updates(filename, status_collection)
-
-
 def quit_program():
     """
     Quits program
@@ -160,8 +144,11 @@ def quit_program():
 
 
 if __name__ == '__main__':
-    user_collection = main.init_user_collection()
-    status_collection = main.init_status_collection()
+    mongo = main.MongoDBConnection()
+    with mongo:
+        database = mongo.connection.SocialNetwork
+        user_collection = main.init_user_collection(database)
+        status_collection = main.init_status_collection(database)
     menu_options = {
         'A': load_users,
         'B': load_status_updates,
@@ -169,12 +156,10 @@ if __name__ == '__main__':
         'D': update_user,
         'E': search_user,
         'F': delete_user,
-        'G': save_users,
-        'H': add_status,
-        'I': update_status,
-        'J': search_status,
-        'K': delete_status,
-        'L': save_status,
+        'G': add_status,
+        'H': update_status,
+        'I': search_status,
+        'J': delete_status,
         'Q': quit_program
     }
     while True:
@@ -185,12 +170,10 @@ if __name__ == '__main__':
                             D: Update user
                             E: Search user
                             F: Delete user
-                            G: Save user database to file
-                            H: Add status
-                            I: Update status
-                            J: Search status
-                            K: Delete status
-                            L: Save status database to file
+                            G: Add status
+                            H: Update status
+                            I: Search status
+                            J: Delete status
                             Q: Quit
 
                             Please enter your choice: """)

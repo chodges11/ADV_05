@@ -2,28 +2,42 @@
 main driver for a simple social network project
 """
 # pylint: disable = import-error
-# pylint: disable = unused-variable
 # pylint:disable=unspecified-encoding
 
 import csv
+from pymongo import MongoClient
 import users as u
 import user_status as us
 
 
-def init_user_collection():
+class MongoDBConnectionManager():
+    """MongoDB Connection."""
+
+    def __int__(self, hostname = "192.168.86.174", port=27017):
+        self.hostname = hostname
+        self.port = port
+        self.connection = None
+
+    def __enter__(self):
+        self.connection = MongoClient(self.hostname, self.port)
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.connection.close()
+
+
+def init_user_collection(database):
     """
     Creates and returns a new instance of UserCollection
     """
-    new_user_collection = u.UserCollection()
-    return new_user_collection
+    return u.UserCollection(database)
 
 
-def init_status_collection():
+def init_status_collection(database):
     """
     Creates and returns a new instance of UserStatusCollection
     """
-    new_status_collection = us.UserStatusCollection()
-    return new_status_collection
+    return us.UserStatusCollection(database)
 
 
 def load_users(filename, user_collection):
@@ -63,39 +77,6 @@ def load_users(filename, user_collection):
         return False
 
 
-def save_users(filename, user_collection):
-    """
-    Saves all users in user_collection into
-    a CSV file
-
-    Requirements:
-    - If there is an existing file, it will
-    overwrite it.
-    - Returns False if there are any errors
-    (such as an invalid filename).
-    - Otherwise, it returns True.
-    """
-
-    try:
-        with open(filename, 'w', newline='') as csvfile:
-            csv_columns = ['USER_ID', 'EMAIL', 'NAME', 'LASTNAME']
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-            writer.writeheader()
-            list_user = list(user_collection.database.values())
-            counter = 0
-            for element in list_user:
-                csvfile.write(list_user[counter].user_id + ",")
-                csvfile.write(list_user[counter].email + ",")
-                csvfile.write(list_user[counter].user_name + ",")
-                csvfile.write(list_user[counter].user_last_name + "\n")
-                counter += 1
-        return True
-
-    except OSError as error:
-        print(f"{type(error)}: {error}")
-        return False
-
-
 def load_status_updates(filename, status_collection):
     """
     Opens a CSV file with status data and adds it to an existing
@@ -122,35 +103,6 @@ def load_status_updates(filename, status_collection):
                                              user.user_id,
                                              user.status_text,
                                              )
-        return True
-
-    except OSError as error:
-        print(f"{type(error)}: {error}")
-        return False
-
-
-def save_status_updates(filename, status_collection):
-    """
-    Saves all statuses in status_collection into a CSV file
-
-    Requirements:
-    - If there is an existing file, it will overwrite it.
-    - Returns False if there are any errors(such an invalid filename).
-    - Otherwise, it returns True.
-    """
-
-    try:
-        with open(filename, 'w',  newline='') as csvfile:
-            csv_columns = ['STATUS_ID', 'USER_ID', 'STATUS_TEXT']
-            writer = csv.DictWriter(csvfile, fieldnames=csv_columns)
-            writer.writeheader()
-            list_status = list(status_collection.database.values())
-            counter = 0
-            for element in list_status:
-                csvfile.write(list_status[counter].status_id + ",")
-                csvfile.write(list_status[counter].user_id + ",")
-                csvfile.write(list_status[counter].status_text + "\n")
-                counter += 1
         return True
 
     except OSError as error:
