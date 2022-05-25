@@ -26,11 +26,11 @@ class UserStatusCollection():
         """
         add a new status message to the collection
         """
-        query = self.users_coll.search_user(user_id)
-        if query is not None:
+
+        if self.users_coll.find({"_id": user_id}):
+            new_status = {"_id": status_id, "user_id": user_id,
+                          "status_text": status_text}
             try:
-                new_status = {"_id": status_id, "user_id": user_id,
-                              "status_text": status_text}
                 self.status_coll.insert_one(new_status)
                 logger.info('Add Status')
                 return True
@@ -46,12 +46,11 @@ class UserStatusCollection():
         """
         Updates a status message
         """
-        query = self.search_status(status_id)
-        if query is not None:
+        if self.search_status(status_id) is not None:
             status_update = {"_id": status_id, "user_id": user_id,
                              "status_text": status_text}
             updates = {"$set": status_update}
-            self.users_coll.update_one(query, updates)
+            self.status_coll.update_one({"_id": status_id}, updates)
             logger.info('Updated Status')
             return True
         return False
@@ -60,9 +59,8 @@ class UserStatusCollection():
         """
         deletes the status message with id, status_id
         """
-        query = self.search_status(status_id)
-        if query is not None:
-            self.status_coll.delete_one(query)
+        if self.search_status(status_id) is not None:
+            self.status_coll.delete_one({"_id":status_id})
             logger.info('Deleted Status.')
             return True
         logger.info('Did Not Delete Status: status does not exist: ')
@@ -72,8 +70,7 @@ class UserStatusCollection():
         """
         Find and return a status message by its status_id
         """
-        query = {"_id": status_id}
-        if not self.status_coll.find_one(query):
+        if not self.status_coll.find_one({"_id": status_id}):
             # Fails if the status does not exist
             logger.info(
                 'Failed Search For Status in Database: '
@@ -81,4 +78,4 @@ class UserStatusCollection():
             )
             return None
         logger.info('Successfully searched for Status')
-        return self.status_coll.find_one(query)
+        return self.status_coll.find_one({"_id": status_id})

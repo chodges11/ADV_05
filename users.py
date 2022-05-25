@@ -22,13 +22,13 @@ class UserCollection():
         logger.add("log_file.log")
         logger.info('Created New User Collection')
 
-    def add_user(self, user_id, email, user_name, user_last_name):
+    def add_user(self, user_id, user_name, user_last_name, email):
         """
         Adds a new user to the collection
         """
+        new_user = {"_id": user_id, "user_name": user_name,
+                    "user_last_name": user_last_name, "email": email}
         try:
-            new_user = {"_id": user_id, "email": email, "user_name": user_name,
-                        "user_last_name": user_last_name}
             self.users_coll.insert_one(new_user)
             logger.info('Add User')
             return True
@@ -38,20 +38,19 @@ class UserCollection():
             logger.info('Did Not Add User: user already exists')
             return False
 
-    def update_user(self, user_id, email, user_name, user_last_name):
+    def update_user(self, user_id, user_name, user_last_name, email):
         """
         Updates an existing user
         """
-        query = self.search_user(user_id)
-        if query is not None:
+        if self.search_user(user_id) is not None:
             user_update = {
                 "_id": user_id,
-                "email": email,
                 "user_name": user_name,
-                "user_last_name": user_last_name
+                "user_last_name": user_last_name,
+                "email": email
             }
             updates = {"$set": user_update}
-            self.users_coll.update_one(query, updates)
+            self.users_coll.update_one({"_id": user_id}, updates)
             logger.info('Updated User')
             return True
         return False
@@ -60,13 +59,12 @@ class UserCollection():
         """
         Deletes an existing user
         """
-        query = self.search_user(user_id)
-        if query is not None:
+        if self.search_user(user_id) is not None:
             # Didn't get the status deletions aspect on my own, but your
             # example reminded me that non-relational DBs need this extra step.
             # Thanks!
-            self.status_coll.delete_many(query)  # This line
-            self.users_coll.delete_one(query)
+            self.status_coll.delete_many({"_id": user_id})  # This line
+            self.users_coll.delete_one({"_id": user_id})
             logger.info('Deleted User and their statuses.')
             return True
         logger.info('Did Not Delete User: user does not exist: ')
@@ -76,12 +74,11 @@ class UserCollection():
         """
         Searches for user data
         """
-        query = {"_id": user_id}
-        if not self.users_coll.find_one(query):
+        if not self.users_coll.find_one({"_id": user_id}):
             # Fails if the user does not exist
             logger.info(
                 'Failed Search For User in Database: user does not exist'
             )
             return None
         logger.info('Successfully searched for User.')
-        return self.users_coll.find_one(query)
+        return self.users_coll.find_one({"_id": user_id})

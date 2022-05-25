@@ -28,13 +28,13 @@ def add_user():
     Adds a new user into the database
     """
     user_id = input('User ID: ')
-    email = input('User email: ')
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
+    email = input('User email: ')
     if main.add_user(user_id,
-                     email,
                      user_name,
                      user_last_name,
+                     email,
                      user_collection):
         print("User was successfully added")
     else:
@@ -46,13 +46,13 @@ def update_user():
     Updates information for an existing user
     """
     user_id = input('User ID: ')
-    email = input('User email: ')
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
+    email = input('User email: ')
     if main.update_user(user_id,
-                        email,
                         user_name,
                         user_last_name,
+                        email,
                         user_collection):
         print("User was successfully updated")
     else:
@@ -68,10 +68,10 @@ def search_user():
     if result is None:
         print("ERROR: User does not exist")
     else:
-        print(f"User ID: {result.user_id}")
-        print(f"Email: {result.email}")
-        print(f"Name: {result.user_name}")
-        print(f"Last name: {result.user_last_name}")
+        print(f"User ID: {result['_id']}")
+        print(f"Name: {result['user_name']}")
+        print(f"Last name: {result['user_last_name']}")
+        print(f"Email: {result['email']}")
 
 
 def delete_user():
@@ -120,9 +120,9 @@ def search_status():
     if result is None:
         print("ERROR: Status does not exist")
     else:
-        print(f"User ID: {result.user_id}")
-        print(f"Status ID: {result.status_id}")
-        print(f"Status text: {result.status_text}")
+        print(f"Status ID: {result['_id']}")
+        print(f"User ID: {result['user_id']}")
+        print(f"Status text: {result['status_text']}")
 
 
 def delete_status():
@@ -149,35 +149,35 @@ if __name__ == '__main__':
         db = mongo.client['users_and_status']
         user_collection = main.init_user_collection(db)
         status_collection = main.init_status_collection(db)
-    menu_options = {
-        'A': load_users,
-        'B': load_status_updates,
-        'C': add_user,
-        'D': update_user,
-        'E': search_user,
-        'F': delete_user,
-        'G': add_status,
-        'H': update_status,
-        'I': search_status,
-        'J': delete_status,
-        'Q': quit_program
-    }
-    while True:
-        user_selection = input("""
-                            A: Load user database
-                            B: Load status database
-                            C: Add user
-                            D: Update user
-                            E: Search user
-                            F: Delete user
-                            G: Add status
-                            H: Update status
-                            I: Search status
-                            J: Delete status
-                            Q: Quit
-
-                            Please enter your choice: """)
-        if user_selection.upper() in menu_options:
-            menu_options[user_selection.upper()]()
-        else:
-            print("Invalid option")
+        menu_options = {
+            'A': load_users,
+            'B': load_status_updates,
+            'C': add_user,
+            'D': update_user,
+            'E': search_user,
+            'F': delete_user,
+            'G': add_status,
+            'H': update_status,
+            'I': search_status,
+            'J': delete_status,
+            'Q': quit_program
+        }
+        while True:
+            user_selection = input("""
+                                A: Load user database
+                                B: Load status database
+                                C: Add user
+                                D: Update user
+                                E: Search user
+                                F: Delete user
+                                G: Add status
+                                H: Update status
+                                I: Search status
+                                J: Delete status
+                                Q: Quit
+    
+                                Please enter your choice: """)
+            if user_selection.upper() in menu_options:
+                menu_options[user_selection.upper()]()
+            else:
+                print("Invalid option")

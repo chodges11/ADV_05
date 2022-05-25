@@ -2,7 +2,8 @@
 main driver for a simple social network project
 """
 # pylint: disable = import-error
-# pylint:disable=unspecified-encoding
+# pylint: disable=unspecified-encoding
+# pylint: disable = invalid-name
 
 import csv
 from pymongo import MongoClient
@@ -13,7 +14,7 @@ import user_status as us
 class MongoDBConnectionManager():
     """MongoDB Connection."""
 
-    def __init__(self, hostname='192.168.86.174', port=27017):
+    def __init__(self, hostname='127.0.0.1', port=27017):
         """Initialize the MongoDB object."""
         self.hostname = hostname
         self.port = port
@@ -60,9 +61,9 @@ def load_users(filename, user_collection):
             csv_dict_reader = csv.DictReader(read_obj)
             for row in csv_dict_reader:
                 user_collection.add_user(row["USER_ID"],
-                                         row["EMAIL"],
                                          row["NAME"],
-                                         row["LASTNAME"]
+                                         row["LASTNAME"],
+                                         row["EMAIL"]
                                          )
         return True
 
@@ -110,9 +111,9 @@ def add_user(user_id, email, user_name, user_last_name, user_collection):
     - Otherwise, it returns True.
     """
     while user_collection.add_user(user_id,
-                                   email,
                                    user_name,
-                                   user_last_name
+                                   user_last_name,
+                                   email
                                    ):
         return True
     return False
@@ -127,9 +128,9 @@ def update_user(user_id, email, user_name, user_last_name, user_collection):
     - Otherwise, it returns True.
     """
     while user_collection.update_user(user_id,
-                                      email,
                                       user_name,
-                                      user_last_name
+                                      user_last_name,
+                                      email
                                       ):
         return True
     return False
@@ -158,7 +159,7 @@ def search_user(user_id, user_collection):
     - Otherwise, it returns None.
     """
     user_search_results = user_collection.search_user(user_id)
-    if user_search_results.user_id is not None:
+    if user_search_results is not None:
         return user_search_results
 
     return None
@@ -175,13 +176,9 @@ def add_status(status_id, user_id, status_text, status_collection):
       user_collection.add_status() returns False).
     - Otherwise, it returns True.
     """
-    new_user_status = us.UserStatus(status_id,
-                                    user_id,
-                                    status_text
-                                    )
-    while status_collection.add_status(new_user_status.status_id,
-                                       new_user_status.user_id,
-                                       new_user_status.status_text
+    while status_collection.add_status(status_id,
+                                       user_id,
+                                       status_text
                                        ):
         return True
     return False
@@ -226,6 +223,6 @@ def search_status(status_id, status_collection):
     - Otherwise, it returns None.
     """
     status_search_results = status_collection.search_status(status_id)
-    if status_search_results.status_id is not None:
+    if status_search_results is not None:
         return status_search_results
     return None
