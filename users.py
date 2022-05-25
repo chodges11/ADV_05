@@ -5,22 +5,7 @@ Classes for user information for the social network project
 
 import sys
 from loguru import logger
-
-
-class Users():
-    """
-    Contains user information
-    """
-
-    def __init__(self, user_id, email, user_name, user_last_name):
-        self.user_id = user_id
-        self.email = email
-        self.user_name = user_name
-        self.user_last_name = user_last_name
-        logger.add(sys.stderr, format="{time} {level} {message}",
-                   filter="my_module", level="INFO")
-        logger.add("log_file.log")
-        logger.info('Created Users')
+from pymongo.errors import DuplicateKeyError
 
 
 class UserCollection():
@@ -28,8 +13,9 @@ class UserCollection():
     Contains a collection of Users objects
     """
 
-    def __init__(self):
-        self.database = {}
+    def __init__(self, database):
+        self.database = database
+
         logger.add(sys.stderr, format="{time} {level} {message}",
                    filter="my_module", level="INFO")
         logger.add("log_file.log")
@@ -44,8 +30,11 @@ class UserCollection():
             # Rejects new user if user_id already exists
             logger.info('Did Not Add User: user_id already exists')
             return False
-        new_user = Users(user_id, email, user_name, user_last_name)
-        self.database[user_id] = new_user
+        new_user = {_id=user_id,
+                        email=email,
+                              user_name = user_name,
+                                          user_last_name = user_last_name}
+        database.insert_one(new_user)
         logger.info('Add User')
         return True
 

@@ -13,31 +13,32 @@ import user_status as us
 class MongoDBConnectionManager():
     """MongoDB Connection."""
 
-    def __int__(self, hostname = "192.168.86.174", port=27017):
+    def __init__(self, hostname='192.168.86.174', port=27017):
+        """Initialize the MongoDB object."""
         self.hostname = hostname
         self.port = port
-        self.connection = None
+        self.client = None
 
     def __enter__(self):
-        self.connection = MongoClient(self.hostname, self.port)
+        self.client = MongoClient(self.hostname, self.port)
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
-        self.connection.close()
+        self.client.close()
 
 
-def init_user_collection(database):
+def init_user_collection(db):
     """
     Creates and returns a new instance of UserCollection
     """
-    return u.UserCollection(database)
+    return u.UserCollection(db)
 
 
-def init_status_collection(database):
+def init_status_collection(db):
     """
     Creates and returns a new instance of UserStatusCollection
     """
-    return us.UserStatusCollection(database)
+    return us.UserStatusCollection(db)
 
 
 def load_users(filename, user_collection):
@@ -55,20 +56,13 @@ def load_users(filename, user_collection):
     - Otherwise, it returns True.
     """
     try:
-        with open(filename, 'r') as read_obj:
+        with open(filename, newline='') as read_obj:
             csv_dict_reader = csv.DictReader(read_obj)
             for row in csv_dict_reader:
-                user = u.Users(user_id=row["USER_ID"],
-                               email=row["EMAIL"],
-                               user_name=row["NAME"],
-                               user_last_name=row["LASTNAME"]
-                               )
-                if user.user_id in user_collection.database:
-                    continue
-                user_collection.add_user(user.user_id,
-                                         user.email,
-                                         user.user_name,
-                                         user.user_last_name
+                user_collection.add_user(row["USER_ID"],
+                                         row["EMAIL"],
+                                         row["NAME"],
+                                         row["LASTNAME"]
                                          )
         return True
 
@@ -90,18 +84,12 @@ def load_status_updates(filename, status_collection):
     - Otherwise, it returns True.
     """
     try:
-        with open(filename, 'r') as read_obj:
+        with open(filename, newline='') as read_obj:
             csv_dict_reader = csv.DictReader(read_obj)
             for row in csv_dict_reader:
-                user = us.UserStatus(status_id=row["STATUS_ID"],
-                                     user_id=row["USER_ID"],
-                                     status_text=row["STATUS_TEXT"],
-                                     )
-                if user.user_id in status_collection.database:
-                    continue
-                status_collection.add_status(user.status_id,
-                                             user.user_id,
-                                             user.status_text,
+                status_collection.add_status(row["STATUS_ID"],
+                                             row["USER_ID"],
+                                             row["STATUS_TEXT"]
                                              )
         return True
 

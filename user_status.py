@@ -5,6 +5,7 @@ classes to manage the user status messages
 
 import sys
 from loguru import logger
+from pymongo.errors import DuplicateKeyError
 
 
 class UserStatus():
@@ -13,7 +14,7 @@ class UserStatus():
     """
 
     def __init__(self, status_id, user_id, status_text):
-        self.status_id = status_id
+        self._id = status_id
         self.user_id = user_id
         self.status_text = status_text
         logger.add(sys.stderr, format="{time} {level} {message}",
@@ -27,8 +28,8 @@ class UserStatusCollection():
     Collection of UserStatus messages
     """
 
-    def __init__(self):
-        self.database = {}
+    def __init__(self, database):
+        self.database = database
         logger.add(sys.stderr, format="{time} {level} {message}",
                    filter="my_module", level="INFO")
         logger.add("log_file.log")

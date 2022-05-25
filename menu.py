@@ -144,11 +144,11 @@ def quit_program():
 
 
 if __name__ == '__main__':
-    mongo = main.MongoDBConnection()
+    mongo = main.MongoDBConnectionManager()
     with mongo:
-        database = mongo.connection.SocialNetwork
-        user_collection = main.init_user_collection(database)
-        status_collection = main.init_status_collection(database)
+        db = mongo.client['users_and_status']
+        user_collection = main.init_user_collection(db)
+        status_collection = main.init_status_collection(db)
     menu_options = {
         'A': load_users,
         'B': load_status_updates,
